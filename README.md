@@ -12,9 +12,18 @@ Version
 ----------------
 ** 0.0.5 **
 
+Current State
+----------------
+This is a work in progress. The only function that I have fully tested is _answerchallenge_. 
+All the others may or may not generate the correct results at this time.
+
+The next step is to create a test framework which can be used to proceed with fixing the issues
+in a test driven manner.
+
 What is it
 ----------------
-A collection of functions pulled from the cube2 engine and wrapped for easy use in other projects which need to interface with cube2.
+A collection of functions pulled from the cube2 engine and wrapped for 
+easy use in other projects which need to interface with cube2.
 
 
 What can I use it for
