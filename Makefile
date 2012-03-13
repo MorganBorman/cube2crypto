@@ -1,3 +1,12 @@
+# Makefile
+# Main Makefile for cube2crypto.
+# Copyright (c) 2012 Morgan Borman
+# E-mail: morgan.borman@gmail.com
+#
+# This software is licensed under the terms of the Zlib license.
+# http://en.wikipedia.org/wiki/Zlib_License
+#
+
 all: cube2crypto_c cube2crypto_py build/shared/cube2crypto.so cube2crypto_js 
 
 cube2crypto_c: build/c/cube2crypto.o build/c/cube2crypto.h

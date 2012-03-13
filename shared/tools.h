@@ -1,3 +1,10 @@
+/*
+
+ This is a modified version of tools.h from the original Sauerbraten source code.
+ Make sure to review the LICENSE file in this directory for more information.
+
+*/
+
 // generic useful stuff for any C++ program
 
 #ifndef _TOOLS_H

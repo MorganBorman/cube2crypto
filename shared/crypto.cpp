@@ -1,3 +1,10 @@
+/*
+
+ This is a modified version of crypto.cpp from the original Sauerbraten source code.
+ Make sure to review the LICENSE file in this directory for more information.
+
+*/
+
 #define _FILE_OFFSET_BITS 64
 
 #include <math.h>
