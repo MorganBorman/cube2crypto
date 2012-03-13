@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<title>cube2crypto js tests</title>
+
+		<script src="../build/js/cube2crypto.o.js" type="text/javascript"></script>		
+		<script src="../build/js/cube2crypto.h.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<script>
+			var keypairs = {
+						0: {private: '37790c116f9d2bdf276abb38c8eb6dec9f00f599072300dd', public: '+7e6469f849ab579a1d66ded718b920ebe524e4177f319b9c'},
+						1: {private: '4af014e96914a1410bd98d1448ae87f252db70b9a35d7fee', public: '-d75136cec00f78c1ec92664e7501c7eb74c60369175ada14'},
+						2: {private: '2542043c72ca2f1edb2a1007b7daba409c50160b4244dfe9', public: '-05688498c47b9471bbf4b78153050b5fd605c7a6b377cbe9'},
+					};
+				
+			for(pairindex in keypairs)
+			{
+				var keypair = keypairs[pairindex];
+				var challengepair = Module.genchallenge(keypair.public, "myseedhere");
+				var answer = Module.answerchallenge(keypair.private, challengepair[0]);
+				
+				alert("" + challengepair[1] + "==" + answer);
+				
+			}
+		</script>
+	
+	</body>
+</html>
