@@ -26,7 +26,7 @@ cube2crypto_js: build/js/cube2crypto.o.js build/js/cube2crypto.h.js
 
 build/js/cube2crypto.o.js: cube2crypto.cpp shared/crypto.cpp shared/tools.h
 	mkdir -p build/js
-	~/git/emscripten/em++ -Wall -O3 -o build/js/cube2crypto.o.js cube2crypto.cpp -s EXPORTED_FUNCTIONS="['_cube2crypto_hashstring', '_cube2crypto_hashpassword', '_cube2crypto_genkeypair', '_cube2crypto_getkeypair', '_cube2crypto_genchallenge', '_cube2crypto_answerchallenge']"
+	~/git/emscripten/em++ -Wall -O3 -o build/js/cube2crypto.o.js cube2crypto.cpp -s EXPORTED_FUNCTIONS="['_cube2crypto_hashstring', '_cube2crypto_hashpassword', '_cube2crypto_genkeypair', '_cube2crypto_getpubkey', '_cube2crypto_genchallenge', '_cube2crypto_answerchallenge']"
 
 build/js/cube2crypto.h.js: cube2crypto.h.js
 	cp cube2crypto.h.js build/js/
