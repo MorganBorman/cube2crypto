@@ -766,19 +766,20 @@ namespace crypto
 
 	void genkeypair(const char *seed, char *privstr, char *pubstr)
 	{
-        vector<char> privatekeybuf;
-        vector<char> publickeybuf;
-
-	    tiger::hashval hash;
-	    tiger::hash((const uchar *)seed, (int)strlen(seed), hash);
 	    gfint privkey;
+	    tiger::hashval hash;
+	    vector<char> privatekeybuf;
+	    vector<char> publickeybuf;
+
+	    tiger::hash((const uchar *)seed, (int)strlen(seed), hash);
+	    
 	    memcpy(privkey.digits, hash.bytes, sizeof(privkey.digits));
 	    privkey.len = 8*sizeof(hash.bytes)/BI_DIGIT_BITS;
 	    privkey.shrink();
 	    privkey.printdigits(privatekeybuf);
 	    privatekeybuf.add('\0');
 
-        strcpy(privstr, privatekeybuf.getbuf());
+            strcpy(privstr, privatekeybuf.getbuf());
 
 	    ecjacobian c(ecjacobian::base);
 	    c.mul(privkey);
@@ -786,7 +787,7 @@ namespace crypto
 	    c.print(publickeybuf);
 	    publickeybuf.add('\0');
 
-        strcpy(pubstr, publickeybuf.getbuf());
+            strcpy(pubstr, publickeybuf.getbuf());
 	}
 
 	void getpubkey(const char *privstr, char *pubstr)
@@ -809,7 +810,7 @@ namespace crypto
 	{
 	    ecjacobian *pubkey = new ecjacobian;
 	    pubkey->parse(pubkeystr);
-
+	
 	    tiger::hashval hash;
 	    tiger::hash((const uchar *)seed, sizeof(seed), hash);
 	    gfint challenge;
