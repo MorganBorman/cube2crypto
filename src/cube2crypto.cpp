@@ -14,10 +14,10 @@
 
 extern "C" 
 {
-	char *cube2crypto_hashstring(const char *str, int hashlen)
+	char *cube2crypto_hashstring(const char *str)
 	{
-		char *hash = (char*)malloc(sizeof(char[hashlen+1]));
-		if(!crypto::hashstring(str, hash, hashlen)) *hash = '\0';
+		char *hash = (char*)malloc(sizeof(char *)*49);
+		if(!crypto::hashstring(str, hash, 512)) *hash = '\0';
 		return hash;
 	}
 
@@ -25,8 +25,8 @@ extern "C"
 	{
 		stringpair keypair;
 
-		keypair.first = (char*)malloc(sizeof(char[49]));
-		keypair.second = (char*)malloc(sizeof(char[50]));
+		keypair.first  = (char*)malloc(sizeof(char *)*49);
+		keypair.second = (char*)malloc(sizeof(char *)*50);
 
 		crypto::genkeypair(seed, keypair.first, keypair.second);
 
@@ -45,8 +45,8 @@ extern "C"
 	{
 		stringpair validation;
 
-		validation.first = (char*)malloc(sizeof(char[50]));
-		validation.second = (char*)malloc(sizeof(char[49]));
+		validation.first = (char*)malloc(sizeof(char *)*50);
+		validation.second = (char*)malloc(sizeof(char *)*49);
 
 		crypto::genchallenge(pubkey, seed, validation.first, validation.second);
 
@@ -55,7 +55,7 @@ extern "C"
 
 	char *cube2crypto_answerchallenge(const char *privkey, const char *challenge)
 	{
-		char *answerstr = (char*)malloc(sizeof(char[49]));
+		char *answerstr = (char*)malloc(sizeof(char *)*49);
 
 		crypto::answerchallenge(privkey, challenge, answerstr);
 

@@ -18,7 +18,7 @@ extern "C" {
 		char *second;
 	};
 
-	char *cube2crypto_hashstring(const char *str, int hashlen);
+	char *cube2crypto_hashstring(const char *str);
 	stringpair cube2crypto_genkeypair(const char *seed);
 	char *cube2crypto_getpubkey(const char *privkey);
 	stringpair cube2crypto_genchallenge(const char *pubkey, const char *seed);

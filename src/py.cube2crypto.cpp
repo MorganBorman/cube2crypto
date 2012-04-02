@@ -14,11 +14,10 @@
 static PyObject *hashstring(PyObject *self, PyObject *args)
 {
 	char *str;
-	int hashlen;
 
-	if (!PyArg_ParseTuple(args, "si", &str, &hashlen)) return NULL;
+	if (!PyArg_ParseTuple(args, "s", &str)) return NULL;
 
-	char *hash = cube2crypto_hashstring(str, hashlen);
+	char *hash = cube2crypto_hashstring(str);
 
 	PyObject *phash = Py_BuildValue("s", hash);
 

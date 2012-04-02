@@ -7,65 +7,83 @@
 # http://en.wikipedia.org/wiki/Zlib_License
 #
 
-all: cube2crypto_c cube2crypto_py build/shared/cube2crypto.so utils cube2crypto_js
+BUILDC = build/c
+BUILDU = build/util
+BUILDP = build/py
+BUILDJ = build/js
+BUILDS = build/shared
 
-utils: build/util/hashstring build/util/genkeypair build/util/genchallenge build/util/getpubkey build/util/answerchallenge
+UTILDEPS = ${BUILDC}/cube2crypto.o ${BUILDC}/cube2crypto.h
+
+all: cube2crypto_c cube2crypto_py ${BUILDS}/cube2crypto.so utils #cube2crypto_js
+
+utils: ${BUILDU}/hashstring ${BUILDU}/genkeypair ${BUILDU}/genchallenge ${BUILDU}/getpubkey ${BUILDU}/answerchallenge
 	
-build/util/hashstring: hashstring.cpp build/c/cube2crypto.o build/c/cube2crypto.h
-	mkdir -p build/util
-	g++ -Wall -O2 -o build/util/hashstring build/c/cube2crypto.o -Ibuild/c hashstring.cpp
+${BUILDU}/hashstring: hashstring.cpp ${BUILDC}/cube2crypto.o ${BUILDC}/cube2crypto.h
+	mkdir -p ${BUILDU}
+	g++ -Wall -O2 -o $@ $^
 
-build/util/genkeypair: genkeypair.cpp build/c/cube2crypto.o build/c/cube2crypto.h
-	mkdir -p build/util
-	g++ -Wall -O2 -o build/util/genkeypair build/c/cube2crypto.o -Ibuild/c genkeypair.cpp
+${BUILDU}/genkeypair: genkeypair.cpp ${UTILDEPS}
+	mkdir -p ${BUILDU}
+	g++ -Wall -O2 -o $@ $^
 	
-build/util/genchallenge: genchallenge.cpp build/c/cube2crypto.o build/c/cube2crypto.h
-	mkdir -p build/util
-	g++ -Wall -O2 -o build/util/genchallenge build/c/cube2crypto.o -Ibuild/c genchallenge.cpp
+${BUILDU}/genchallenge: genchallenge.cpp ${UTILDEPS}
+	mkdir -p ${BUILDU}
+	g++ -Wall -O2 -o $@ $^
 	
-build/util/getpubkey: getpubkey.cpp build/c/cube2crypto.o build/c/cube2crypto.h
-	mkdir -p build/util
-	g++ -Wall -O2 -o build/util/getpubkey build/c/cube2crypto.o -Ibuild/c getpubkey.cpp
+${BUILDU}/getpubkey: getpubkey.cpp ${UTILDEPS}
+	mkdir -p ${BUILDU}
+	g++ -Wall -O2 -o $@ $^
 
-build/util/answerchallenge: answerchallenge.cpp build/c/cube2crypto.o build/c/cube2crypto.h
-	mkdir -p build/util
-	g++ -Wall -O2 -o build/util/answerchallenge build/c/cube2crypto.o -Ibuild/c answerchallenge.cpp
+${BUILDU}/answerchallenge: answerchallenge.cpp ${UTILDEPS}
+	mkdir -p ${BUILDU}
+	g++ -Wall -O2 -o $@ $^
 
-cube2crypto_c: build/c/cube2crypto.o build/c/cube2crypto.h
+cube2crypto_c: ${UTILDEPS}
 
-build/c/cube2crypto.o: cube2crypto.cpp shared/crypto.cpp shared/tools.h
-	mkdir -p build/c
-	g++ -Wall -O0 -g -fPIC -c -o build/c/cube2crypto.o cube2crypto.cpp
+${BUILDC}/cube2crypto.o: cube2crypto.cpp shared/crypto.cpp shared/tools.h
+	mkdir -p ${BUILDC}
+	g++ -Wall -O0 -g -fPIC -c -o $@ $<
 
-build/c/cube2crypto.h: cube2crypto.h
-	cp cube2crypto.h build/c/
+${BUILDC}/cube2crypto.h: cube2crypto.h
+	cp cube2crypto.h ${BUILDC}/
 
-build/shared/cube2crypto.so: build/c/cube2crypto.o build/c/cube2crypto.h
-	mkdir -p build/shared
-	g++ -Wall -O2 -shared -o build/shared/cube2crypto.so build/c/cube2crypto.o
+${BUILDS}/cube2crypto.so: ${UTILDEPS}
+	mkdir -p ${BUILDS}
+	g++ -Wall -O2 -shared -o $@ $<
 
-cube2crypto_js: build/js/cube2crypto.o.js build/js/cube2crypto.h.js
+cube2crypto_js: ${BUILDJ}/cube2crypto.o.js ${BUILDJ}/cube2crypto.h.js
 
-build/js/cube2crypto.o.js: cube2crypto.cpp shared/crypto.cpp shared/tools.h
-	mkdir -p build/js
-	~/git/emscripten/em++ -Wall -O2 -o build/js/cube2crypto.o.js cube2crypto.cpp -s EXPORTED_FUNCTIONS="['_cube2crypto_hashstring', '_cube2crypto_genkeypair', '_cube2crypto_getpubkey', '_cube2crypto_genchallenge', '_cube2crypto_answerchallenge']" -s PRECISE_I64_MATH=1
+${BUILDJ}/cube2crypto.o.js: cube2crypto.cpp shared/crypto.cpp shared/tools.h
+	mkdir -p ${BUILDJ}
+	~/git/emscripten/em++ -Wall -O2 -o ${BUILDJ}/cube2crypto.o.js cube2crypto.cpp -s EXPORTED_FUNCTIONS="['_cube2crypto_hashstring', '_cube2crypto_genkeypair', '_cube2crypto_getpubkey', '_cube2crypto_genchallenge', '_cube2crypto_answerchallenge']" -s PRECISE_I64_MATH=1
 
-build/js/cube2crypto.h.js: cube2crypto.h.js
-	cp cube2crypto.h.js build/js/
+${BUILDJ}/cube2crypto.h.js: cube2crypto.h.js
+	cp cube2crypto.h.js ${BUILDJ}/
 
 cube2crypto_py: cube2crypto.h py.cube2crypto.cpp setup.py
-	mkdir -p build/py
+	mkdir -p ${BUILDP}
 	python setup.py build
 
-clean:
-	rm -rf build
-	rm -rf *.o a.out
+ifneq ("$(wildcard build/lib*)", "")
+  MOVELIBS = mv -f build/lib* ${BUILDP}/
+endif
 
 tidy:
-	mkdir -p build/py
+	mkdir -p ${BUILDP}
 	rm -rf build/temp*
-	mv -f build/lib* build/py/
+	
+	#only move the lib* folders if they exist
+	${MOVELIBS}
+	
 	rm -rf a.out
+
+clean: tidy
+	rm -rf build/c
+	rm -rf build/py
+	rm -rf build/util
+	rm -rf build/shared
+	rm -rf *.o a.out
 
 install:
 	python setup.py install

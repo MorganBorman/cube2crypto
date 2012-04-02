@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	char *answer = cube2crypto_hashstring(argv[1], 512);
+	char *answer = cube2crypto_hashstring(argv[1]);
 
 	std::cout << "hash value:\t" << answer << "\n";
 
