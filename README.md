@@ -6,25 +6,23 @@ By: Morgan Borman
 License
 ----------------
 
-This software is licensed under the terms of the Zlib license except where otherwise indicated.
+This software is licensed under the terms of the Zlib license except where 
+otherwise indicated.
 
 Version
 ----------------
-** 0.0.5 **
+** 0.1.6 **
 
 Current State
 ----------------
-This is a work in progress. The only function that I have fully tested is _answerchallenge_. 
-All the others may or may not generate the correct results at this time.
-
-The next step is to create a test framework which can be used to proceed with fixing the issues
-in a test driven manner.
+Cube2crypto appears to be in a stable and functional state. If you encounter
+anything which does not work as expected please file an issue on github at
+https://github.com/MorganBorman/cube2crypto/issues
 
 What is it
 ----------------
-A collection of functions pulled from the cube2 engine and wrapped for 
-easy use in other projects which need to interface with cube2.
-
+A collection of functions pulled from the cube 2 engine and wrapped for 
+easy use in other projects which need to interface with cube 2.
 
 What can I use it for
 ----------------
