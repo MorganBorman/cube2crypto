@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../build/c/cube2crypto.h"
+#include <string.h>
+#include "../../src/build/c/cube2crypto.h"
 
 //Some test data
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -13,37 +14,19 @@ static struct stringhash
 {
 	{"", 								"2339ca36c0310f42f529bb1b67e66161a7e48594d2ed373f"},
 	{"a", 								"77ebbffee2e78fbae28c9fb35f787acf16e342f7f5428790"},
-	{"abc", 							"a0a2f0872ff799f2f853ea9aa76ce9b0ff6a1b0eb5af7417"},
-	{"message digest", 						"a033b07c17cf5c6f6f2bdde50922eb9509d00bec803303f7"},
-	{"abcdefghijklmnopqrstuvwxyz", 					"845ffe56cce48f566d2d5b4dae629b8e8e52bde17283aeb4"},
-	{"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 	"dd61d98336b2c88a5407ab5c9d9cd52829b66c20f65a9f2e"},
+	{"abc", 							"a2ba41488e1c852ffb8b5cff145ba725159231c159b7f539"},
+	{"message digest", 						"9d188fbc8702a159d0fc038457e144c115f7aca15aa5926f"},
+	{"abcdefghijklmnopqrstuvwxyz", 					"71414a27ee5ed703404021fbcc5530a2b01106f23fb7ee9e"},
+	{"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 	"f0b79f1ab9c9852f7b16d07f8ef4a03c7ac136e1b7357fe8"},
 };
 
 #define NUMSTRINGHASHES ((int)(sizeof(stringhashes)/sizeof(stringhashes[0])))
 
-static struct passwordhash
-{
-	int cn;
-	int sessionid;
-	const char *pwd;
-	const char *hash;
-} passwordhashes[] =
-{
-	{0, 	0, 	"", 								"8818313ef4b23397d349affb4436256e3d7d5c645c8b8278"},
-	{1, 	13333, 	"a", 								"210246fac5d808b283683e38da7236672aaf41aa6d27bf3b"},
-	{5, 	112211, "abc", 								"da46fcd0c145d5fefe74759660272d07302d5836b6365c45"},
-	{21, 	323344, "message digest", 						"d753158e72f042bbea50f19675ec1a785213e3999d23ee30"},
-	{117, 	13243, 	"abcdefghijklmnopqrstuvwxyz", 					"8225119b22966d3418fcc94762c629fbbf2942c68db0d247"},
-	{0, 	12345, 	"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 	"1fae21a15070bd4415efa2259bb02ac3ad3bcf50798cbe0a"},
-};
-
-#define NUMPASSWORDHASHES ((int)(sizeof(passwordhashes)/sizeof(passwordhashes[0])))
-
 static struct authkey
 {
 	const char *pwd;
-	const char *private;
-	const char *public;
+	const char *privkey;
+	const char *pubkey;
 } authkeys[] =
 {
 	{"", 										"f373de2d49584e7a16166e76b1bb925f24f0130c63ac9332", "+2c1fb1dd4f2a7b9d81320497c64983e92cda412ed50f33aa"},
@@ -64,6 +47,7 @@ int main(int argc, char *argv[])
 
 	int ix; //used for iterating through each of the test data sets.
 	char *result; //used for storing the returned data from each data set.
+	stringpair resultpair;
 	
 	printf("String Hashing\n---------------------------------------------------------------------\n");
 	
@@ -84,38 +68,18 @@ int main(int argc, char *argv[])
 		}
 		
 		free(result);
-	}
-	
-	printf("Password Hashing\n---------------------------------------------------------------------\n");
-	
-	for (ix = 0; ix < NUMPASSWORDHASHES; ix++)
-	{
-		printf("Hashing: '%s'\nWith cn: %d\nWith sessionid: %d\nExpecting: '%s'\n", passwordhashes[ix].pwd, passwordhashes[ix].cn, passwordhashes[ix].sessionid, passwordhashes[ix].hash);
-		result = cube2crypto_hashpassword(passwordhashes[ix].cn, passwordhashes[ix].sessionid, passwordhashes[ix].pwd);
-		printf("Received: '%s'\n\n", result);
-		if(!strcmp(result, passwordhashes[ix].hash))
-		{
-			passes++;
-			printf("pass\n\n");
-		}
-		else
-		{
-			failures++;
-			printf("fail\n\n");
-		}
-		
-		free(result);
+		result = NULL;
 	}
 	
 	printf("Keygen\n---------------------------------------------------------------------\n");
 	
 	for (ix = 0; ix < NUMAUTHKEYS; ix++)
 	{
-		printf("Seed: '%s'\nExpected Private: '%s'\nExpected Public: '%s'\n", authkeys[ix].pwd, authkeys[ix].private, authkeys[ix].public);
-		result = cube2crypto_genkeypair(authkeys[ix].pwd);
-		printf("Received Private: '%s'\n", result);
-		printf("Received Public: '%s'\n\n", result+50);
-		if(!strcmp(result, authkeys[ix].private) && !strcmp(result+50, authkeys[ix].public))
+		printf("Seed: '%s'\nExpected Private: '%s'\nExpected Public: '%s'\n", authkeys[ix].pwd, authkeys[ix].privkey, authkeys[ix].pubkey);
+		resultpair = cube2crypto_genkeypair(authkeys[ix].pwd);
+		printf("Received Private: '%s'\n", resultpair.first);
+		printf("Received Public: '%s'\n\n", resultpair.second);
+		if(!strcmp(resultpair.first, authkeys[ix].privkey) && !strcmp(resultpair.second, authkeys[ix].pubkey))
 		{
 			passes++;
 			printf("pass\n\n");
@@ -125,18 +89,21 @@ int main(int argc, char *argv[])
 			failures++;
 			printf("fail\n\n");
 		}
-		
-		free(result);
+
+		free(resultpair.first);
+		free(resultpair.second);
+		resultpair.first = NULL;
+		resultpair.second = NULL;
 	}
 	
 	printf("Get public key\n---------------------------------------------------------------------\n");
 	
 	for (ix = 0; ix < NUMAUTHKEYS; ix++)
 	{
-		printf("Given Private: '%s'\nExpected Public: '%s'\n", authkeys[ix].private, authkeys[ix].public);
-		result = cube2crypto_getpubkey(authkeys[ix].private);
+		printf("Given Private: '%s'\nExpected Public: '%s'\n", authkeys[ix].privkey, authkeys[ix].pubkey);
+		result = cube2crypto_getpubkey(authkeys[ix].privkey);
 		printf("Received Public: '%s'\n\n", result);
-		if(!strcmp(result, authkeys[ix].public))
+		if(!strcmp(result, authkeys[ix].pubkey))
 		{
 			passes++;
 			printf("pass\n\n");
@@ -148,23 +115,22 @@ int main(int argc, char *argv[])
 		}
 		
 		free(result);
+		result = NULL;
 	}
 	
 	printf("Challenges\n---------------------------------------------------------------------\n");
 	
-	char *given_answer;
-	
 	for (ix = 0; ix < NUMAUTHKEYS; ix++)
 	{
-		printf("Public: '%s'\n", authkeys[ix].public);
-		result = cube2crypto_genchallenge(authkeys[ix].public, authkeys[ix].pwd);
-		printf("Challenge: '%s'\n", result);
-		printf("Expected Answer: '%s'\n", result+51);
+		printf("Public: '%s'\n", authkeys[ix].pubkey);
+		resultpair = cube2crypto_genchallenge(authkeys[ix].pubkey, authkeys[ix].pwd);
+		printf("Challenge: '%s'\n", resultpair.first);
+		printf("Expected Answer: '%s'\n", resultpair.second);
 		
-		given_answer = cube2crypto_answerchallenge(authkeys[ix].private, result);
-		printf("Given Answer: '%s'\n\n", given_answer);
+		result = cube2crypto_answerchallenge(authkeys[ix].privkey, resultpair.first);
+		printf("Given Answer: '%s'\n\n", result);
 		
-		if(!strcmp(result+51, given_answer))
+		if(!strcmp(result, resultpair.second))
 		{
 			passes++;
 			printf("pass\n\n");
@@ -176,6 +142,11 @@ int main(int argc, char *argv[])
 		}
 		
 		free(result);
+		result = NULL;
+		free(resultpair.first);
+		free(resultpair.second);
+		resultpair.first = NULL;
+		resultpair.second = NULL;
 	}
 
 	printf("Overall results\n---------------------------------------------------------------------\n\n");

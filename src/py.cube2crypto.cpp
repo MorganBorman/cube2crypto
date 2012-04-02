@@ -27,36 +27,18 @@ static PyObject *hashstring(PyObject *self, PyObject *args)
 	return phash;
 }
 
-static PyObject *hashpassword(PyObject *self, PyObject *args)
-{
-	int cn, sessionid;
-	char *str;
-
-	if (!PyArg_ParseTuple(args, "iis", &cn, &sessionid, &str)) return NULL;
-
-	char *hash = cube2crypto_hashpassword(cn, sessionid, str);
-
-	PyObject *phash = Py_BuildValue("s", hash);
-
-	free(hash);
-
-	return phash;
-}
-
 static PyObject *genkeypair(PyObject *self, PyObject *args)
 {
 	char *seed;
 
 	if (!PyArg_ParseTuple(args, "s", &seed)) return NULL;
 
-	char *pair = cube2crypto_genkeypair(seed);
+	stringpair answer = cube2crypto_genkeypair(seed);
 
-	char *privkey = &pair[0];
-	char *pubkey = &pair[50];
+	PyObject *keypair = Py_BuildValue("(ss)", answer.first, answer.second);
 
-	PyObject *keypair = Py_BuildValue("(ss)", privkey, pubkey);
-
-	free(pair);
+	free(answer.first);
+	free(answer.second);
 
 	return keypair;
 }
@@ -83,14 +65,12 @@ static PyObject *genchallenge(PyObject *self, PyObject *args)
 
 	if (!PyArg_ParseTuple(args, "ss", &pubkey, &seed)) return NULL;
 
-	char *challenge = cube2crypto_genchallenge(pubkey, seed);
+	stringpair challenge = cube2crypto_genchallenge(pubkey, seed);
 
-	//char *challenge = challenge[0];
-	char *answer = &challenge[51];
+	PyObject *pchallenge = Py_BuildValue("(ss)", challenge.first, challenge.second);
 
-	PyObject *pchallenge = Py_BuildValue("(ss)", challenge, answer);
-
-	free(challenge);
+	free(challenge.first);
+	free(challenge.second);
 
 	return pchallenge;
 }
@@ -116,7 +96,6 @@ static PyObject *answerchallenge(PyObject *self, PyObject *args)
 static PyMethodDef ModuleMethods[] = 
 {
 	def(hashstring, 	"Hash a string given the string and the length of the desired hash."),
-	def(hashpassword, 	"Hash a password using the same pattern as the cube2 engine given the cn, sessionid, and password."),
 	def(genkeypair, 	"Generate an auth key pair given a seed string."),
 	def(getpubkey, 		"Get the public key given the private one."),
 	def(genchallenge, 	"Generate a challenge answer pair given the public key, and a seed string."),

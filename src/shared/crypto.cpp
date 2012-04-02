@@ -41,6 +41,19 @@ namespace tiger
 
     chunk sboxes[4*256];
 
+#define sb1 (sboxes)
+#define sb2 (sboxes+256)
+#define sb3 (sboxes+256*2)
+#define sb4 (sboxes+256*3)
+
+#define round(a, b, c, x) \
+      c ^= x; \
+      a -= sb1[((c)>>(0*8))&0xFF] ^ sb2[((c)>>(2*8))&0xFF] ^ \
+       sb3[((c)>>(4*8))&0xFF] ^ sb4[((c)>>(6*8))&0xFF] ; \
+      b += sb4[((c)>>(1*8))&0xFF] ^ sb3[((c)>>(3*8))&0xFF] ^ \
+       sb2[((c)>>(5*8))&0xFF] ^ sb1[((c)>>(7*8))&0xFF] ; \
+      b *= mul;
+
     void compress(const chunk *str, chunk state[3])
     {
         chunk a, b, c;
@@ -68,19 +81,6 @@ namespace tiger
                 x4 -= x3 ^ ((~x2)>>23); x5 ^= x4; x6 += x5; x7 -= x6 ^ 0x0123456789ABCDEFULL;
             }
 
-#define sb1 (sboxes)
-#define sb2 (sboxes+256)
-#define sb3 (sboxes+256*2)
-#define sb4 (sboxes+256*3)
-
-#define round(a, b, c, x) \
-      c ^= x; \
-      a -= sb1[((c)>>(0*8))&0xFF] ^ sb2[((c)>>(2*8))&0xFF] ^ \
-       sb3[((c)>>(4*8))&0xFF] ^ sb4[((c)>>(6*8))&0xFF] ; \
-      b += sb4[((c)>>(1*8))&0xFF] ^ sb3[((c)>>(3*8))&0xFF] ^ \
-       sb2[((c)>>(5*8))&0xFF] ^ sb1[((c)>>(7*8))&0xFF] ; \
-      b *= mul;
-
             uint mul = !pass_no ? 5 : (pass_no==1 ? 7 : 9);
             round(a, b, c, x0) round(b, c, a, x1) round(c, a, b, x2) round(a, b, c, x3)
             round(b, c, a, x4) round(c, a, b, x5) round(a, b, c, x6) round(b, c, a, x7)
@@ -95,6 +95,14 @@ namespace tiger
         state[0] = a;
         state[1] = b;
         state[2] = c;
+    }
+
+    void printsboxes()
+    {
+		for(int i=0; i<256*4; i += 2)
+		{
+			printf("    0x%016llX, 0x%016llX /* %4d */\n", sboxes[i], sboxes[i+1], i);
+		}
     }
 
     void gensboxes()
@@ -119,6 +127,9 @@ namespace tiger
                 ((uchar *)&sboxes[sb + ((uchar *)&state[abc])[col]])[col] = val;
             }
         }
+
+
+        //printsboxes();
     }
 
     void hash(const uchar *str, int length, hashval &val)
@@ -754,13 +765,16 @@ namespace crypto
 	    tiger::hashval hv;
 	    if(maxlen < 2*(int)sizeof(hv.bytes) + 1) return false;
 	    tiger::hash((uchar *)str, strlen(str), hv);
+
+	    char *resultp = result;
+
 	    loopi(sizeof(hv.bytes))
 	    {
 		uchar c = hv.bytes[i];
-		*result++ = "0123456789abcdef"[c&0xF];
-		*result++ = "0123456789abcdef"[c>>4];
+		*resultp++ = "0123456789abcdef"[c&0xF];
+		*resultp++ = "0123456789abcdef"[c>>4];
 	    }
-	    *result = '\0';
+	    *resultp = '\0';
 	    return true;
 	}
 
@@ -806,13 +820,13 @@ namespace crypto
         strcpy(pubstr, publickeybuf.getbuf());
 	}
 
-	void genchallenge(char *pubkeystr, char *seed, char *challengestr, char *answerstr)
+	void genchallenge(const char *pubkeystr, const char *seed, char *challengestr, char *answerstr)
 	{
 	    ecjacobian *pubkey = new ecjacobian;
 	    pubkey->parse(pubkeystr);
 	
 	    tiger::hashval hash;
-	    tiger::hash((const uchar *)seed, sizeof(seed), hash);
+	    tiger::hash((const uchar *)seed, strlen(seed), hash);
 	    gfint challenge;
 	    memcpy(challenge.digits, hash.bytes, sizeof(challenge.digits));
 	    challenge.len = 8*sizeof(hash.bytes)/BI_DIGIT_BITS;

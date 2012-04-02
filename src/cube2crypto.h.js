@@ -11,26 +11,20 @@
 Module.hashstring = function(pwd, hashlen)
 {
 	var pPwd = Module.allocate(Module.intArrayFromString(pwd), 'i8', Module.ALLOC_STACK);
-	var hashlen = hashlen;
+	//var hashlen = hashlen;
 
 	return Module.Pointer_stringify(Module._cube2crypto_hashstring(pPwd, hashlen));
 }
 
-Module.hashpassword = function(cn, sessionid, pwd)
-{
-	var cn = cn;
-	var sessionid = sessionid;
-	var pPwd = Module.allocate(Module.intArrayFromString(pwd), 'i8', Module.ALLOC_STACK);
-
-	return Module.Pointer_stringify(Module._cube2crypto_hashpassword(cn, sessionid, pPwd));
-}
-
 Module.genkeypair = function(seed)
 {
+	var pStringPair = Module.allocate(8, 'i32', Module.ALLOC_STACK);
 	var pSeed = Module.allocate(Module.intArrayFromString(seed), 'i8', Module.ALLOC_STACK);
 
-	var pPrivkey = Module._cube2crypto_genkeypair(pSeed);
-	var pPubkey = pPrivkey + 50;
+	Module._cube2crypto_genkeypair(pStringPair, pSeed);
+	
+	var pPrivkey = Module.getValue(((pStringPair)|0), 'i32');
+	var pPubkey = Module.getValue(((pStringPair+4)|0), 'i32');
 
 	var key_pair = [Module.Pointer_stringify(pPrivkey), Module.Pointer_stringify(pPubkey)];
 
@@ -46,11 +40,14 @@ Module.getpubkey = function(privkey)
 
 Module.genchallenge = function(pubkey, seed)
 {
+	var pStringPair = Module.allocate(8, 'i32', Module.ALLOC_STACK);
 	var pPubkey = Module.allocate(Module.intArrayFromString(pubkey), 'i8', Module.ALLOC_STACK);
 	var pSeed = Module.allocate(Module.intArrayFromString(seed), 'i8', Module.ALLOC_STACK);
 
-	var pChallenge = Module._cube2crypto_genchallenge(pPubkey, pSeed);
-	var pAnswer = pChallenge + 51;
+	Module._cube2crypto_genchallenge(pStringPair, pPubkey, pSeed);
+	
+	var pChallenge = Module.getValue(((pStringPair)|0), 'i32');
+	var pAnswer = Module.getValue(((pStringPair+4)|0), 'i32');
 
 	var validation_pair = [Module.Pointer_stringify(pChallenge), Module.Pointer_stringify(pAnswer)];
 

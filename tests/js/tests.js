@@ -4,19 +4,10 @@
 stringhashes = [
 	{string: '', hash: '2339ca36c0310f42f529bb1b67e66161a7e48594d2ed373f'},
 	{string: 'a', hash: '77ebbffee2e78fbae28c9fb35f787acf16e342f7f5428790'},
-	{string: 'abc', hash: 'a0a2f0872ff799f2f853ea9aa76ce9b0ff6a1b0eb5af7417'},
-	{string: 'message digest', hash: 'a033b07c17cf5c6f6f2bdde50922eb9509d00bec803303f7'},
-	{string: 'abcdefghijklmnopqrstuvwxyz', hash: '845ffe56cce48f566d2d5b4dae629b8e8e52bde17283aeb4'},
-	{string: 'abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq', hash: 'dd61d98336b2c88a5407ab5c9d9cd52829b66c20f65a9f2e'},
-];
-
-passwordhashes = [
-	{cn: 0, sessionid: 0, pwd: '', hash: '8818313ef4b23397d349affb4436256e3d7d5c645c8b8278'},
-	{cn: 1, sessionid: 13333, pwd: 'a', hash: '210246fac5d808b283683e38da7236672aaf41aa6d27bf3b'},
-	{cn: 5, sessionid: 112211, pwd: 'abc', hash: 'da46fcd0c145d5fefe74759660272d07302d5836b6365c45'},
-	{cn: 21, sessionid: 323344, pwd: 'message digest', hash: 'd753158e72f042bbea50f19675ec1a785213e3999d23ee30'},
-	{cn: 117, sessionid: 13243, pwd: 'abcdefghijklmnopqrstuvwxyz', hash: '8225119b22966d3418fcc94762c629fbbf2942c68db0d247'},
-	{cn: 0, sessionid: 12345, pwd: 'abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq', hash: '1fae21a15070bd4415efa2259bb02ac3ad3bcf50798cbe0a'},
+	{string: 'abc', hash: 'a2ba41488e1c852ffb8b5cff145ba725159231c159b7f539'},
+	{string: 'message digest', hash: '9d188fbc8702a159d0fc038457e144c115f7aca15aa5926f'},
+	{string: 'abcdefghijklmnopqrstuvwxyz', hash: '71414a27ee5ed703404021fbcc5530a2b01106f23fb7ee9e'},
+	{string: 'abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq', hash: 'f0b79f1ab9c9852f7b16d07f8ef4a03c7ac136e1b7357fe8'},
 ];
 
 authkeys = [
@@ -39,50 +30,10 @@ for (var ix = 0; ix < stringhashes.length; ix++)
 	
 	var hashrow = stringhashes[ix];
 	
-	var string = hashrow.string;
-	
-	var hash = Module.hashstring(string, 48);
+	var hash = Module.hashstring(hashrow.string, 49);
 	
 	test_outcome.Parameters = 	{
-									'string': string,
-									'correct hash': hashrow.hash,
-									'given hash': hash,
-								};
-	
-	if (hashrow.hash == hash)
-	{
-		test_outcome.Status = 'pass';
-	}
-	else
-	{
-		test_outcome.Status = 'fail';
-	}
-	
-	print_test(test_outcome);
-}
-
-
-//Test Password Hashing
-////////////////////////////////////////////////////////////////////////////////////////
-
-for (var ix = 0; ix < passwordhashes.length; ix++) 
-{
-	var test_outcome = Object();
-	
-	test_outcome.Name = "Password Hashing #" + ix;
-	
-	var hashrow = passwordhashes[ix];
-	
-	var cn = hashrow.cn;
-	var sessionid = hashrow.sessionid;
-	var pwd = hashrow.pwd;
-	
-	var hash = Module.hashpassword(cn, sessionid, pwd);
-	
-	test_outcome.Parameters = 	{
-									'cn': cn,
-									'sessionid': sessionid,
-									'pwd': pwd,
+									'string': hashrow.string,
 									'correct hash': hashrow.hash,
 									'given hash': hash,
 								};
@@ -198,24 +149,3 @@ for (var ix = 0; ix < authkeys.length; ix++)
 	
 	print_test(test_outcome);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -12,12 +12,17 @@
 extern "C" {
 #endif
 
+	struct stringpair
+	{
+		char *first;
+		char *second;
+	};
+
 	char *cube2crypto_hashstring(const char *str, int hashlen);
-	char *cube2crypto_hashpassword(int cn, int sessionid, const char *pwd);
-	char *cube2crypto_genkeypair(char *seed);
-	char *cube2crypto_getpubkey(char *privkey);
-	char *cube2crypto_genchallenge(char *pubkey, char *seed);
-	char *cube2crypto_answerchallenge(char *privkey, char *challenge);
+	stringpair cube2crypto_genkeypair(const char *seed);
+	char *cube2crypto_getpubkey(const char *privkey);
+	stringpair cube2crypto_genchallenge(const char *pubkey, const char *seed);
+	char *cube2crypto_answerchallenge(const char *privkey, const char *challenge);
 
 #ifdef __cplusplus
 } /* closing brace for extern "C" */
