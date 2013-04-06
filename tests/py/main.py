@@ -26,7 +26,7 @@ class TestCube2Crypto(unittest.TestCase):
 
     def test_hash_strings(self):
         for stringhash in stringhashes:
-            self.assertEqual(stringhash['hash'], cube2crypto.hashstring(stringhash['string'], 49))
+            self.assertEqual(stringhash['hash'], cube2crypto.hashstring(stringhash['string']))
 
     def test_auth_key_gen(self):
         for authkey in authkeys:

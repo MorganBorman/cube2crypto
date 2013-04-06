@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	for (ix = 0; ix < NUMSTRINGHASHES; ix++)
 	{
 		printf("Hashing: '%s'\nExpecting: '%s'\n", stringhashes[ix].string, stringhashes[ix].hash);
-		result = cube2crypto_hashstring(stringhashes[ix].string, 512);
+		result = cube2crypto_hashstring(stringhashes[ix].string);
 		printf("Received: '%s'\n\n", result);
 		if(!strcmp(result, stringhashes[ix].hash))
 		{
