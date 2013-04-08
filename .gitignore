@@ -1,11 +1,6 @@
 src/.classpath
 src/.project
-src/build/c/
-src/build/lib.linux-i686-2.7/
-src/build/shared/
-src/build/temp.linux-i686-2.7/
-src/build/util/
-src/jcube2crypto/
+src/build/**/*
 temp
 tests/cpp/main
 tests/cpp/main.o
