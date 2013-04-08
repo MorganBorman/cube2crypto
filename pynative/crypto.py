@@ -353,7 +353,7 @@ if __name__ == '__main__':
                 
         def test_challenges_native_to_py(self):
             for authkey in authkeys:
-                generated_challenge = cube2crypto.genchallenge(authkey['public'], Random.get_random_bytes(24))
+                generated_challenge = cube2crypto.genchallenge(authkey['public'], repr(Random.get_random_bytes(24)))
                 answer = answer_challenge(authkey['private'], generated_challenge[0])
                 
                 self.assertEqual(generated_challenge[1], answer)
