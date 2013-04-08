@@ -287,13 +287,16 @@ def parse_jacobian(s):
     
     return (x, y, z)
     
+def gfield_to_str(x):
+    return hex(x)[2:-1].zfill(48)
+    
 def jacobian_to_str(x, y, z):
     if bit_test(y, 0):
         sign = '-'
     else:
         sign = '+'
         
-    return sign+hex(x)[2:-1]
+    return sign+gfield_to_str(x)
 
 def get_public_key(privkeystr):
     privkey = int(privkeystr, 16)
@@ -304,7 +307,7 @@ def get_public_key(privkeystr):
     
 def generate_key_pair():
     privkey = get_random_number(24)
-    privkeystr = hex(privkey)[2:-1]
+    privkeystr = gfield_to_str(privkey)
     pubkeystr = get_public_key(privkeystr)
     return (privkeystr, pubkeystr)
 
@@ -313,7 +316,7 @@ def answer_challenge(privkeystr, challengestr):
     answer = parse_jacobian(challengestr)
     answer = jacobian_mult(answer, privkey)
     x, y, z = jacobian_normalize(*answer)
-    return hex(x)[2:-1].zfill(48)
+    return gfield_to_str(x)
 
 def generate_challenge(pubkeystr):
     pubkey = parse_jacobian(pubkeystr)
@@ -326,7 +329,7 @@ def generate_challenge(pubkeystr):
     secret = jacobian_normalize(*secret)
     
     challengestr = jacobian_to_str(*secret)
-    answerstr = hex(answer[0])[2:-1].zfill(48)
+    answerstr = gfield_to_str(answer[0])
     
     return (challengestr, answerstr)
 
